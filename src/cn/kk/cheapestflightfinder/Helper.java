@@ -20,14 +20,12 @@
  */
 package cn.kk.cheapestflightfinder;
 
+import java.awt.Desktop;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -38,38 +36,61 @@ import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.Socket;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.filechooser.FileSystemView;
+
 public final class Helper {
 
-    public static final int BUFFER_SIZE = 1024 * 1024 * 4;
-
-    private final ByteBuffer IO_BB = ByteBuffer.wrap(new byte[BUFFER_SIZE]);
-
     public static boolean isEmptyOrNull(String text) {
-        return text == null || text.isEmpty();
+        return (text == null) || text.isEmpty();
     }
 
     public final static boolean isNotEmptyOrNull(String text) {
-        return text != null && text.length() > 0;
+        return (text != null) && (text.length() > 0);
+    }
+
+    public final static String substringBetweenLast(final String text, final String start, final String end) {
+        return Helper.substringBetweenLast(text, start, end, true);
+    }
+
+    public final static String substringBetweenLast(final String text, final String start, final String end,
+            final boolean trim) {
+        int nEnd = text.lastIndexOf(end);
+        int nStart = -1;
+        if (nEnd > 1) {
+            nStart = text.lastIndexOf(start, nEnd - 1);
+        } else {
+            return null;
+        }
+        if ((nStart < nEnd) && (nStart != -1) && (nEnd != -1)) {
+            if (trim) {
+                return text.substring(nStart + start.length(), nEnd).trim();
+            } else {
+                return text.substring(nStart + start.length(), nEnd);
+            }
+        } else {
+            return null;
+        }
+
     }
 
     public static final String substringBetween(final String text, final String start, final String end) {
-        return substringBetween(text, start, end, true);
+        return Helper.substringBetween(text, start, end, true);
     }
 
     public static final String substringBetween(final String text, final String start, final String end,
             final boolean trim) {
         final int nStart = text.indexOf(start);
         final int nEnd = text.indexOf(end, nStart + start.length() + 1);
-        if (nStart != -1 && nEnd > nStart) {
+        if ((nStart != -1) && (nEnd > nStart)) {
             if (trim) {
                 return text.substring(nStart + start.length(), nEnd).trim();
             } else {
@@ -86,7 +107,7 @@ public final class Helper {
         if (nEnd != -1) {
             nStart = text.lastIndexOf(start, nEnd - 1);
         }
-        if (nStart < nEnd && nStart != -1 && nEnd != -1) {
+        if ((nStart < nEnd) && (nStart != -1) && (nEnd != -1)) {
             return text.substring(nStart + start.length(), nEnd);
         } else {
             return null;
@@ -146,9 +167,9 @@ public final class Helper {
         StringBuilder sb = new StringBuilder(len);
         for (int i = 0; i < len; i++) {
             char ch = str.charAt(i);
-            if (ch < ' ' || ch >= 0x7F || ch == fileSep || ch == '?' || ch == '*' || ch == '\\' || ch == ':'
-                    || ch == '"' || ch == '/' || ch == '+' || ch == '$' || ch == '|' || ch == '&'
-                    || (ch == '.' && i == 0) || ch == escape) {
+            if ((ch < ' ') || (ch >= 0x7F) || (ch == fileSep) || (ch == '?') || (ch == '*') || (ch == '\\')
+                    || (ch == ':') || (ch == '"') || (ch == '/') || (ch == '+') || (ch == '$') || (ch == '|')
+                    || (ch == '&') || ((ch == '.') && (i == 0)) || (ch == escape)) {
                 sb.append(escape);
                 if (ch < 0x10) {
                     sb.append('0');
@@ -161,11 +182,14 @@ public final class Helper {
         return sb.toString();
     }
 
-    public static final boolean appendCookies(final StringBuffer cookie, final HttpURLConnection conn)
-            throws IOException {
+    public String lastLocation;
+
+    public final boolean appendCookies(final StringBuffer cookie, final HttpURLConnection conn) throws IOException {
         try {
             boolean changed = false;
-            List<String> values = conn.getHeaderFields().get("Set-Cookie");
+            Map<String, List<String>> headerFields = conn.getHeaderFields();
+            this.lastLocation = conn.getHeaderField("Location");
+            List<String> values = headerFields.get("Set-Cookie");
             if (values != null) {
                 for (String v : values) {
                     if (v.indexOf("deleted") == -1) {
@@ -208,9 +232,9 @@ public final class Helper {
                     referer = url;
                 }
                 conn.setRequestProperty("Referer", referer);
-                final Set<String> keys = connectionHeaders.keySet();
+                final Set<String> keys = this.connectionHeaders.keySet();
                 for (String k : keys) {
-                    final String value = connectionHeaders.get(k);
+                    final String value = this.connectionHeaders.get(k);
                     if (value != null) {
                         conn.setRequestProperty(k, value);
                     }
@@ -219,21 +243,21 @@ public final class Helper {
                 if (output != null) {
                     conn.setDoOutput(true);
                     BufferedOutputStream out = new BufferedOutputStream(conn.getOutputStream());
-                    out.write(output.getBytes(CHARSET_UTF8));
+                    out.write(output.getBytes(Helper.CHARSET_UTF8));
                     out.close();
                 }
-                if (appendCookies(cookie, conn)) {
-                    putConnectionHeader("Cookie", cookie.toString());
+                if (appendCookies(this.cookie, conn)) {
+                    putConnectionHeader("Cookie", this.cookie.toString());
                 }
                 break;
             } catch (Throwable e) {
                 // 连接中断
-                System.err.println(e.toString());
+                e.printStackTrace();
                 if (retries++ > 20) {
                     throw new IOException(e);
                 } else {
                     try {
-                        Thread.sleep(60 * retries * 100 + ((int) Math.random() * 100 * 60 * retries));
+                        Thread.sleep((60 * retries * 100) + ((int) Math.random() * 100 * 60 * retries));
                     } catch (InterruptedException e1) {
                         e1.printStackTrace();
                     }
@@ -253,31 +277,31 @@ public final class Helper {
     }
 
     public final void putConnectionHeader(final String key, final String value) {
-        connectionHeaders.put(key, value);
+        this.connectionHeaders.put(key, value);
     }
 
     public final String getHeader(String key) {
-        return connectionHeaders.get(key);
+        return this.connectionHeaders.get(key);
     }
 
     public final void resetConnectionHeaders() {
-        connectionHeaders.clear();
-        connectionHeaders.put("User-Agent", userAgent);
-        if (Helper.isNotEmptyOrNull(cookieString)) {
-            cookie = new StringBuffer(cookieString);
-            putConnectionHeader("Cookie", cookie.toString());
+        this.connectionHeaders.clear();
+        this.connectionHeaders.put("User-Agent", this.userAgent);
+        if (Helper.isNotEmptyOrNull(this.cookieString)) {
+            this.cookie = new StringBuffer(this.cookieString);
+            putConnectionHeader("Cookie", this.cookie.toString());
         }
-        connectionHeaders.put("Cache-Control", "no-cache");
-        connectionHeaders.put("Pragma", "no-cache");
+        // this.connectionHeaders.put("Cache-Control", "no-cache");
+        // this.connectionHeaders.put("Pragma", "no-cache");
     }
 
-    public static String userAgent = "Mozilla/5.0 (Windows NT " + (((int) (Math.random() * 2) + 5)) + ".1) Firefox/"
+    public String userAgent = "Mozilla/5.0 (Windows NT " + (((int) (Math.random() * 2) + 5)) + ".1) Firefox/"
             + (((int) (Math.random() * 8) + 3)) + "." + (((int) (Math.random() * 6) + 0)) + "."
             + (((int) (Math.random() * 6) + 0));
 
     public String cookieString = "";
 
-    private final Map<String, String> connectionHeaders = new HashMap<String, String>();
+    public final Map<String, String> connectionHeaders = new HashMap<String, String>();
 
     public static final Charset CHARSET_UTF8 = Charset.forName("UTF-8");
 
@@ -296,7 +320,7 @@ public final class Helper {
     public String download(final String url, final String to, boolean overwrite) throws IOException {
         final File toFile = new File(to);
         // 925 -> forbidden file
-        if (!overwrite && toFile.exists() && toFile.length() > 0 && toFile.length() != 925) {
+        if (!overwrite && toFile.exists() && (toFile.length() > 0) && (toFile.length() != 925)) {
             return null;
         } else {
             OutputStream out = null;
@@ -336,4 +360,146 @@ public final class Helper {
             out.write(bytes, 0, len);
         }
     }
+
+    public static final void writeToFile(final InputStream in, final File file) throws IOException {
+        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+        byte[] bytes = new byte[1024 * 1024];
+        int len;
+        while ((len = in.read(bytes)) > 0) {
+            out.write(bytes, 0, len);
+        }
+        out.close();
+    }
+
+    private static final FileSystemView FILE_SYSTEM = FileSystemView.getFileSystemView();
+
+    public static final FileInputStream findResourceAsStream(final String resource) throws IllegalArgumentException,
+            IOException {
+        final File file = Helper.findResource(resource);
+        if (null != file) {
+            return new FileInputStream(file);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * <pre>
+     * Find resource in possible directories:
+     * 1. find in the running directory
+     * 2. find in the user directory
+     * 3. find in the user document directory
+     * 4. find on the user desktop
+     * 5. get from root of the running directory
+     * 6. load from class path and system path
+     * 7. find in all root directories e.g. C:, D:
+     * 8. find in temporary directory
+     * </pre>
+     * 
+     * @param resource
+     * @return
+     * @throws IllegalArgumentException
+     * @throws IOException
+     */
+    public static final File findResource(final String resource) throws IllegalArgumentException {
+        File resFile = null;
+        if (new File(resource).isFile()) {
+            // in run directory
+            resFile = new File(resource);
+        }
+        if (resFile == null) {
+            // in user directory
+            final String dir = System.getProperty("user.home");
+            if (!Helper.isEmptyOrNull(dir)) {
+                if (new File(dir, resource).isFile()) {
+                    resFile = new File(dir, resource);
+                }
+            }
+        }
+        if (resFile == null) {
+            // in user document directory
+            final File dir = Helper.FILE_SYSTEM.getDefaultDirectory();
+            if (dir != null) {
+                if (new File(dir, resource).isFile()) {
+                    resFile = new File(dir, resource);
+                }
+            }
+        }
+        if (resFile == null) {
+            // in user desktop directory
+            final File dir = Helper.FILE_SYSTEM.getHomeDirectory();
+            if (dir != null) {
+                if (new File(dir, resource).isFile()) {
+                    resFile = new File(dir, resource);
+                }
+            }
+        }
+        if (resFile == null) {
+            // get from root of run directory
+            final File dir = new File("/");
+            if (dir.isDirectory()) {
+                if (new File(dir, resource).isFile()) {
+                    resFile = new File(dir, resource);
+                }
+            }
+        }
+        if (resFile == null) {
+            // get from class path (root)
+            URL resUrl = Helper.class.getResource("/" + resource);
+            if (resUrl != null) {
+                try {
+                    resFile = File.createTempFile(resource, null);
+                    Helper.writeToFile(Helper.class.getResourceAsStream("/" + resource), resFile);
+                } catch (IOException e) {
+                    System.err.println("从JAR导出'" + resource + "'时出错：" + e.toString());
+                }
+                if ((resFile != null) && !resFile.isFile()) {
+                    resFile = null;
+                }
+            }
+        }
+        if (resFile == null) {
+            // find in root directories, e.g. c:\, d:\, e:\, x:\
+            File[] dirs = File.listRoots();
+            for (File dir : dirs) {
+                if (dir.isDirectory()) {
+                    if (new File(dir, resource).isFile()) {
+                        resFile = new File(dir, resource);
+                    }
+                }
+            }
+        }
+        if (resFile == null) {
+            // in temp directory
+            final String dir = System.getProperty("java.io.tmpdir");
+            if (!Helper.isEmptyOrNull(dir)) {
+                if (new File(dir, resource).isFile()) {
+                    resFile = new File(dir, resource);
+                }
+            }
+        }
+        return resFile;
+    }
+
+    public static final void openUri(URI uri) {
+        if (Desktop.isDesktopSupported()) {
+            try {
+                Desktop.getDesktop().browse(uri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.err.println("Not supported!");
+        }
+    }
+
+    public final static byte[] fromHex(String hexString) {
+        String[] data = hexString.trim().split(" ");
+        byte[] result = new byte[data.length];
+        for (int i = 0; i < data.length; i++) {
+            result[i] = (byte) Integer.parseInt(data[i]);
+        }
+        return result;
+    }
+
 }
