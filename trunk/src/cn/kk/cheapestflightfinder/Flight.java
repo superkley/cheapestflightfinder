@@ -1,3 +1,23 @@
+/*  Copyright (c) 2012 Xiaoyun Zhu
+ * 
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy  
+ *  of this software and associated documentation files (the "Software"), to deal  
+ *  in the Software without restriction, including without limitation the rights  
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell  
+ *  copies of the Software, and to permit persons to whom the Software is  
+ *  furnished to do so, subject to the following conditions:
+ *  
+ *  The above copyright notice and this permission notice shall be included in  
+ *  all copies or substantial portions of the Software.
+ *  
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,  
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE  
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER  
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN  
+ *  THE SOFTWARE.  
+ */
 package cn.kk.cheapestflightfinder;
 
 import java.util.Calendar;
@@ -31,66 +51,78 @@ public class Flight {
 
     private double priceValue = Integer.MAX_VALUE;
 
+    private String resultPage;
+
+    private String searchPage;
+
     public Flight(GregorianCalendar start, GregorianCalendar stop) {
         this.departureDate = start;
         this.returnDate = stop;
     }
 
     public String getAccArr() {
-        return accArr;
+        return this.accArr;
     }
 
     public String getAccDep() {
-        return accDep;
+        return this.accDep;
     }
 
     public String getDepAirline() {
-        return depAirline;
+        return this.depAirline;
     }
 
     public GregorianCalendar getDepartureDate() {
-        return departureDate;
+        return this.departureDate;
     }
 
     public String getDepartureDateAsString() {
-        return getCalendarString(departureDate);
+        return getCalendarString(this.departureDate);
     }
 
     public String getDepDuration() {
-        return depDuration;
+        return this.depDuration;
     }
 
     public String getFlightType() {
-        return flightType;
+        return this.flightType;
     }
 
     public String getMode() {
-        return mode;
+        return this.mode;
     }
 
     public String getPrice() {
-        return price;
+        return this.price;
     }
 
     public String getRetAirline() {
-        return retAirline;
+        return this.retAirline;
     }
 
     public String getRetDuration() {
-        return retDuration;
+        return this.retDuration;
     }
 
     public GregorianCalendar getReturnDate() {
-        return returnDate;
+        return this.returnDate;
     }
 
     public String getReturnDateAsString() {
-        return getCalendarString(returnDate);
+        if (this.flightType.endsWith("OW")) {
+            return "";
+        } else {
+            return getCalendarString(this.returnDate);
+        }
     }
 
     private String getCalendarString(GregorianCalendar calendar) {
-        return fill(calendar.get(Calendar.DAY_OF_MONTH)) + "." + fill(calendar.get(Calendar.MONTH) + 1) + "."
-                + calendar.get(Calendar.YEAR);
+        if (this.returnDate != null) {
+            return fill(calendar.get(Calendar.DAY_OF_MONTH)) + "." + fill(calendar.get(Calendar.MONTH) + 1) + "."
+                    + calendar.get(Calendar.YEAR);
+        } else {
+            return "";
+        }
     }
 
     private String fill(int i) {
@@ -102,11 +134,11 @@ public class Flight {
     }
 
     public boolean isCabinClass() {
-        return cabinClass;
+        return this.cabinClass;
     }
 
     public boolean isNonStop() {
-        return nonStop;
+        return this.nonStop;
     }
 
     public void setAccArr(String accArr) {
@@ -148,7 +180,7 @@ public class Flight {
     public void setPrice(String price) {
         this.price = price;
         try {
-            priceValue = Double.parseDouble(price);
+            this.priceValue = Double.parseDouble(price);
         } catch (NumberFormatException e) {
             // ignore
         }
@@ -168,15 +200,31 @@ public class Flight {
 
     @Override
     public String toString() {
-        return "[" + getDepartureDateAsString() + ", " + getReturnDateAsString() + "] " + price + " ("
-                + depDuration + " / " + depAirline + ", " + retDuration + " / " + retAirline + ")";
+        return "[" + getDepartureDateAsString() + ", " + getReturnDateAsString() + "] " + this.price + " ("
+                + this.depDuration + " / " + this.depAirline + ", " + this.retDuration + " / " + this.retAirline + ")";
     }
 
     public double getPriceValue() {
-        return priceValue;
+        return this.priceValue;
     }
 
     public void setPriceValue(double priceValue) {
         this.priceValue = priceValue;
+    }
+
+    public String getResultPage() {
+        return this.resultPage;
+    }
+
+    public void setResultPage(String resultPage) {
+        this.resultPage = resultPage;
+    }
+
+    public String getSearchPage() {
+        return searchPage;
+    }
+
+    public void setSearchPage(String searchPage) {
+        this.searchPage = searchPage;
     }
 }
