@@ -23,6 +23,7 @@ package cn.kk.cheapestflightfinder;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
@@ -30,28 +31,34 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.LayoutStyle;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.border.EtchedBorder;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
 
 public class Main extends javax.swing.JFrame {
-    private static final String TEXT_STOP = "取消查询";
+    private static final String TEXT_WAIT = Messages.getString("main.waiting"); //$NON-NLS-1$
+    private static final String TEXT_STOP = Messages.getString("main.cancel"); //$NON-NLS-1$
     private static final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
     private static final Color SELECTION_COLOR = new java.awt.Color(146, 173, 247);
     private static final int CURRENT_YEAR;
@@ -115,7 +122,7 @@ public class Main extends javax.swing.JFrame {
      */
     // <editor-fold defaultstate="collapsed" desc="Generated Code">
     private void initComponents() {
-
+        this.pnlProgress = new JPanel();
         this.pnlForm = new javax.swing.JPanel();
         this.lblFrom = new javax.swing.JLabel();
         this.cbFrom = new WideComboBox();
@@ -142,38 +149,39 @@ public class Main extends javax.swing.JFrame {
         this.btnSave = new javax.swing.JButton();
         this.spResults = new javax.swing.JScrollPane();
         this.tblResults = new javax.swing.JTable();
+        this.lblProgress = new JLabel(Messages.getString("main.progress")); //$NON-NLS-1$
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("穷飞 - 机票价格查询");
+        setTitle(Messages.getString("main.title")); //$NON-NLS-1$
         setBackground(new java.awt.Color(255, 255, 255));
 
         this.pnlForm.setBackground(new java.awt.Color(207, 245, 255));
         this.pnlForm.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
         this.lblFrom.setLabelFor(this.cbFrom);
-        this.lblFrom.setText("出发地");
-        this.lblFrom.setToolTipText("起飞机场");
+        this.lblFrom.setText(Messages.getString("main.origin")); //$NON-NLS-1$
+        this.lblFrom.setToolTipText(Messages.getString("main.originAirport")); //$NON-NLS-1$
 
         this.cbFrom.setModel(new javax.swing.DefaultComboBoxModel(new String[] {}));
-        this.cbFrom.setToolTipText("起飞机场");
+        this.cbFrom.setToolTipText(Messages.getString("main.originAirport")); //$NON-NLS-1$
         this.cbFrom.setOpaque(false);
 
         this.lblTo.setLabelFor(this.cbTo);
-        this.lblTo.setText("目的地");
-        this.lblTo.setToolTipText("目的地机场");
+        this.lblTo.setText(Messages.getString("main.target")); //$NON-NLS-1$
+        this.lblTo.setToolTipText(Messages.getString("main.targetAirport")); //$NON-NLS-1$
 
         this.cbTo.setModel(new javax.swing.DefaultComboBoxModel(new String[] {}));
-        this.cbTo.setToolTipText("目的地机场");
+        this.cbTo.setToolTipText(Messages.getString("main.targetAirport")); //$NON-NLS-1$
         this.cbTo.setOpaque(false);
 
         this.lblDep.setLabelFor(this.cbDepDay);
-        this.lblDep.setText("最早起飞");
-        this.lblDep.setToolTipText("最早出发日期");
+        this.lblDep.setText(Messages.getString("main.earliest")); //$NON-NLS-1$
+        this.lblDep.setToolTipText(Messages.getString("main.earliestDeparture")); //$NON-NLS-1$
 
-        this.cbDepDay.setToolTipText("最早出发日期");
+        this.cbDepDay.setToolTipText(Messages.getString("main.earliestDeparture")); //$NON-NLS-1$
         this.cbDepDay.setOpaque(false);
 
-        this.cbDepMonth.setToolTipText("最早出发日期");
+        this.cbDepMonth.setToolTipText(Messages.getString("main.earliestDeparture")); //$NON-NLS-1$
         this.cbDepMonth.setOpaque(false);
         this.cbDepMonth.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -182,17 +190,17 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
-        this.cbDepYear.setToolTipText("最早出发日期");
+        this.cbDepYear.setToolTipText(Messages.getString("main.earliestDeparture")); //$NON-NLS-1$
         this.cbDepYear.setOpaque(false);
 
         this.lblReturn.setLabelFor(this.cbReturnDay);
-        this.lblReturn.setText("最晚回程");
-        this.lblReturn.setToolTipText("最晚回程日期");
+        this.lblReturn.setText(Messages.getString("main.latest")); //$NON-NLS-1$
+        this.lblReturn.setToolTipText(Messages.getString("main.latestReturn")); //$NON-NLS-1$
 
-        this.cbReturnDay.setToolTipText("最晚回程日期");
+        this.cbReturnDay.setToolTipText(Messages.getString("main.latestReturn")); //$NON-NLS-1$
         this.cbReturnDay.setOpaque(false);
 
-        this.cbReturnMonth.setToolTipText("最晚回程日期");
+        this.cbReturnMonth.setToolTipText(Messages.getString("main.latestReturn")); //$NON-NLS-1$
         this.cbReturnMonth.setOpaque(false);
         this.cbReturnMonth.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -201,38 +209,38 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
-        this.cbReturnYear.setToolTipText("最晚回程日期");
+        this.cbReturnYear.setToolTipText(Messages.getString("main.latestReturn")); //$NON-NLS-1$
         this.cbReturnYear.setOpaque(false);
 
-        this.lblMin.setText("最短停留");
-        this.lblMin.setToolTipText("最短停留时间[天]");
+        this.lblMin.setText(Messages.getString("main.minStay")); //$NON-NLS-1$
+        this.lblMin.setToolTipText(Messages.getString("main.minStayDays")); //$NON-NLS-1$
 
         this.tfMin.setHorizontalAlignment(SwingConstants.RIGHT);
         this.tfMin.setText("14");
-        this.tfMin.setToolTipText("最短停留时间[天]");
+        this.tfMin.setToolTipText(Messages.getString("main.minStayDays")); //$NON-NLS-1$
         this.tfMin.setSelectionColor(getBackground());
 
-        this.lblMax.setText("最长停留");
-        this.lblMax.setToolTipText("最长停留时间[天]");
+        this.lblMax.setText(Messages.getString("main.maxStay")); //$NON-NLS-1$
+        this.lblMax.setToolTipText(Messages.getString("main.maxStayDays")); //$NON-NLS-1$
 
         this.tfMax.setHorizontalAlignment(SwingConstants.RIGHT);
         this.tfMax.setText("45");
-        this.tfMax.setToolTipText("最长停留时间[天]");
+        this.tfMax.setToolTipText(Messages.getString("main.maxStayDays")); //$NON-NLS-1$
         this.tfMax.setSelectionColor(this.tfMin.getSelectionColor());
 
         this.chkDirect.setSelected(true);
-        this.chkDirect.setText("只限直飞");
-        this.chkDirect.setToolTipText("只显示直飞机票");
+        this.chkDirect.setText(Messages.getString("main.direct")); //$NON-NLS-1$
+        this.chkDirect.setToolTipText(Messages.getString("main.displayDirectFlightsOnly")); //$NON-NLS-1$
         this.chkDirect.setOpaque(false);
 
         this.chkEconomy.setSelected(true);
-        this.chkEconomy.setText("经济舱");
-        this.chkEconomy.setToolTipText("经济舱");
+        this.chkEconomy.setText(Messages.getString("main.economy")); //$NON-NLS-1$
+        this.chkEconomy.setToolTipText(Messages.getString("main.economy")); //$NON-NLS-1$
         this.chkEconomy.setOpaque(false);
 
         this.chkReturn.setSelected(true);
-        this.chkReturn.setText("往返");
-        this.chkReturn.setToolTipText("往返票");
+        this.chkReturn.setText(Messages.getString("main.roundTrip")); //$NON-NLS-1$
+        this.chkReturn.setToolTipText(Messages.getString("main.roundTripTicket")); //$NON-NLS-1$
         this.chkReturn.setOpaque(false);
         this.chkReturn.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -241,8 +249,8 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
-        this.btnSearch.setText("查询价格");
-        this.btnSearch.setToolTipText("开始查询最优惠机票价格");
+        this.btnSearch.setText(Messages.getString("main.search")); //$NON-NLS-1$
+        this.btnSearch.setToolTipText(Messages.getString("main.startCalculating")); //$NON-NLS-1$
         this.btnSearch.addActionListener(new java.awt.event.ActionListener() {
             @Override
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -250,8 +258,8 @@ public class Main extends javax.swing.JFrame {
             }
         });
 
-        this.btnSave.setText("导出");
-        this.btnSave.setToolTipText("保存机票价格结果");
+        this.btnSave.setText(Messages.getString("main.export")); //$NON-NLS-1$
+        this.btnSave.setToolTipText(Messages.getString("main.exportResults")); //$NON-NLS-1$
         this.btnSave.setEnabled(false);
         this.btnSave.addActionListener(new java.awt.event.ActionListener() {
             @Override
@@ -401,35 +409,38 @@ public class Main extends javax.swing.JFrame {
         this.spResults.setOpaque(false);
 
         this.tblResults.setAutoCreateRowSorter(true);
-        this.tblResults.setModel(new javax.swing.table.DefaultTableModel(new Object[][] {
+        this.tblResults
+                .setModel(new javax.swing.table.DefaultTableModel(
+                        new Object[][] {
 
-        }, new String[] {
-                "价格 [€]", "起飞日期", "旅程时间", "航空公司", "回程时间", "旅程时间", "航空公司", "网站链接"
-        }) {
-            Class[] types = new Class[] {
-                    java.lang.Double.class,
-                    java.lang.String.class,
-                    java.lang.String.class,
-                    java.lang.String.class,
-                    java.lang.String.class,
-                    java.lang.String.class,
-                    java.lang.String.class,
-                    URL.class
-            };
-            boolean[] canEdit = new boolean[] {
-                    false, false, false, false, false, false, false, false
-            };
+                        },
+                        new String[] {
+                                Messages.getString("main.price"), Messages.getString("main.departure"), Messages.getString("main.depDuration"), Messages.getString("main.depAirline"), Messages.getString("main.return"), Messages.getString("main.retDuration"), Messages.getString("main.retAirline"), Messages.getString("main.liveUrl") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+                        }) {
+                    Class[] types = new Class[] {
+                            java.lang.Double.class,
+                            java.lang.String.class,
+                            java.lang.String.class,
+                            java.lang.String.class,
+                            java.lang.String.class,
+                            java.lang.String.class,
+                            java.lang.String.class,
+                            URL.class
+                    };
+                    boolean[] canEdit = new boolean[] {
+                            false, false, false, false, false, false, false, false
+                    };
 
-            @Override
-            public Class getColumnClass(int columnIndex) {
-                return this.types[columnIndex];
-            }
+                    @Override
+                    public Class getColumnClass(int columnIndex) {
+                        return this.types[columnIndex];
+                    }
 
-            @Override
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return this.canEdit[columnIndex];
-            }
-        });
+                    @Override
+                    public boolean isCellEditable(int rowIndex, int columnIndex) {
+                        return this.canEdit[columnIndex];
+                    }
+                });
         UriCellRenderer renderer = new UriCellRenderer();
         this.tblResults.setDefaultRenderer(URL.class, renderer);
         this.tblResults.addMouseListener(renderer);
@@ -451,8 +462,16 @@ public class Main extends javax.swing.JFrame {
         this.spResults.setViewportView(this.tblResults);
         this.spResults.getViewport().setBackground(new Color(0xf0f0fe));
 
-        GroupLayout layout = new GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
+        JLayeredPane layeredPane = new JLayeredPane() {
+            @Override
+            public void setBounds(int x, int y, int width, int height) {
+                super.setBounds(x, y, width, height);
+                updateProgressPanel(width, height);
+            }
+        };
+
+        GroupLayout layout = new GroupLayout(layeredPane);
+        layeredPane.setLayout(layout);
         layout.setHorizontalGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addComponent(this.spResults)
                 .addComponent(this.pnlForm, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
@@ -462,6 +481,14 @@ public class Main extends javax.swing.JFrame {
                                 GroupLayout.PREFERRED_SIZE)
                         .addComponent(this.spResults, GroupLayout.PREFERRED_SIZE, GroupLayout.PREFERRED_SIZE,
                                 Short.MAX_VALUE)));
+
+        this.pnlProgress.setVisible(false);
+        this.pnlProgress.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED, new Color(204, 204, 255),
+                new Color(0, 51, 102)));
+        this.pnlProgress.setBackground(new Color(0x30f9e0e0));
+        this.pnlProgress.add(this.lblProgress);
+        layeredPane.add(this.pnlProgress, JLayeredPane.PALETTE_LAYER);
+        getContentPane().add(layeredPane);
 
         setPreferredSize(new Dimension(900, 460));
         setMinimumSize(getPreferredSize());
@@ -490,7 +517,7 @@ public class Main extends javax.swing.JFrame {
 
             @Override
             public String getDescription() {
-                return "机票报价表文件";
+                return Messages.getString("main.exportFile"); //$NON-NLS-1$
             }
         });
         int ret = fc.showSaveDialog(this);
@@ -532,6 +559,8 @@ public class Main extends javax.swing.JFrame {
         } else {
             try {
                 disableMain();
+                setTitle(Messages.getString("main.title") + " - " + Main.TEXT_WAIT);
+                this.pnlProgress.setVisible(true);
                 this.btnSearch.setText(Main.TEXT_STOP);
                 this.btnSearch.setEnabled(true);
 
@@ -602,11 +631,12 @@ public class Main extends javax.swing.JFrame {
      *            the command line arguments
      */
     public static void main(String args[]) {
+        System.out.println(Locale.getDefault());
         try {
             UIManager.put("ComboBox.selectionBackground", Main.SELECTION_COLOR);
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            System.err.println("软件错误。请重新安装。");
+            System.err.println(Messages.getString("main.systemError")); //$NON-NLS-1$
         }
         java.awt.EventQueue.invokeLater(new Runnable() {
 
@@ -629,7 +659,7 @@ public class Main extends javax.swing.JFrame {
                         }
                     });
                 } catch (IOException e) {
-                    System.err.println("软件错误。请重新安装。");
+                    System.err.println(Messages.getString("main.systemError")); //$NON-NLS-1$
                 }
             }
         });
@@ -656,10 +686,12 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JLabel lblReturn;
     private javax.swing.JLabel lblTo;
     private javax.swing.JPanel pnlForm;
+    private javax.swing.JPanel pnlProgress;
     private javax.swing.JScrollPane spResults;
     private javax.swing.JTable tblResults;
     private javax.swing.JFormattedTextField tfMax;
     private javax.swing.JFormattedTextField tfMin;
+    private JLabel lblProgress;
 
     // End of variables declaration
 
@@ -726,11 +758,11 @@ public class Main extends javax.swing.JFrame {
         if (this.chkReturn.isSelected()) {
             this.tfMin.setEnabled(true);
             this.tfMax.setEnabled(true);
-            this.lblReturn.setText("最晚回程");
+            this.lblReturn.setText(Messages.getString("main.latest")); //$NON-NLS-1$
         } else {
             this.tfMin.setEnabled(false);
             this.tfMax.setEnabled(false);
-            this.lblReturn.setText("最晚起飞");
+            this.lblReturn.setText(Messages.getString("main.latestDeparture")); //$NON-NLS-1$
         }
     }
 
@@ -750,7 +782,9 @@ public class Main extends javax.swing.JFrame {
         this.tfMax.setEnabled(true);
         this.btnSearch.setEnabled(true);
         checkReturnState();
-        this.btnSearch.setText("查询价格");
+        this.btnSearch.setText(Messages.getString("main.search")); //$NON-NLS-1$
+        setTitle(Messages.getString("main.title")); //$NON-NLS-1$
+        this.pnlProgress.setVisible(false);
         setCursor(Cursor.getDefaultCursor());
     }
 
@@ -758,26 +792,51 @@ public class Main extends javax.swing.JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                String url = Helper.chopNull(flight.getSearchPage());
-                if (url.isEmpty()) {
-                    url = "http://www.fluege.de?k=1";
+                if (flight != null) {
+                    String url = Helper.chopNull(flight.getSearchPage());
+                    if (url.isEmpty()) {
+                        url = "http://www.fluege.de?k=1";
+                    }
+                    try {
+                        ((DefaultTableModel) Main.this.tblResults.getModel()).insertRow(
+                                0,
+                                new Object[] {
+                                        Double.valueOf(flight.getPriceValue()),
+                                        Helper.chopNull(flight.getDepartureDateAsString()),
+                                        Helper.chopNull(flight.getDepDuration()),
+                                        Helper.chopNull(flight.getDepAirline()),
+                                        Helper.chopNull(flight.getReturnDateAsString()),
+                                        Helper.chopNull(flight.getRetDuration()),
+                                        Helper.chopNull(flight.getRetAirline()),
+                                        new URL(url)
+                                });
+                        Main.this.btnSave.setEnabled(true);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
-                try {
-                    ((DefaultTableModel) Main.this.tblResults.getModel()).insertRow(0, new Object[] {
-                            Double.valueOf(flight.getPriceValue()),
-                            Helper.chopNull(flight.getDepartureDateAsString()),
-                            Helper.chopNull(flight.getDepDuration()),
-                            Helper.chopNull(flight.getDepAirline()),
-                            Helper.chopNull(flight.getReturnDateAsString()),
-                            Helper.chopNull(flight.getRetDuration()),
-                            Helper.chopNull(flight.getRetAirline()),
-                            new URL(url)
-                    });
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
+                final int finished = CheapestFlightFinder.LOCK.availablePermits();
+                final int total = CheapestFlightFinder.totalFlights;
+                final long finishedTime = System.currentTimeMillis() - CheapestFlightFinder.started;
+                long estimatedTime = (long) ((finishedTime / (double) finished) * total);
+                if (estimatedTime > (1000 * 60 * 60 * 24 * 365)) {
+                    estimatedTime = -1;
                 }
-                Main.this.btnSave.setEnabled(true);
+                Main.this.lblProgress.setText(Messages.getString("main.status") + finished + " / " + total + Messages.getString("main.timeRemaining") //$NON-NLS-1$ //$NON-NLS-3$
+                        + Helper.formatDuration(estimatedTime));
+                updateProgressPanel(getWidth(), getHeight());
             }
         });
     }
+
+    private void updateProgressPanel(int width, int height) {
+        FontMetrics fm = Main.this.lblProgress.getFontMetrics(Main.this.lblProgress.getFont());
+        final int pw = SwingUtilities.computeStringWidth(fm, Main.TEXT_WAIT) * 2;
+        final int ph = (fm.getHeight()) + 16;
+        final int px = (width - pw) / 2;
+        final int py = height - (ph * 2);
+        Main.this.pnlProgress.setBounds(px, py, pw, ph);
+        // System.out.println("px: " + px + ", py: " + py);
+    }
+
 }

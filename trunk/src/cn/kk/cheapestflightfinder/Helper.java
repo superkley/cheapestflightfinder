@@ -40,6 +40,7 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -219,8 +220,8 @@ public final class Helper {
             try {
                 URL urlObj = new URL(url);
                 conn = (HttpURLConnection) urlObj.openConnection();
-                conn.setConnectTimeout(15000);
-                conn.setReadTimeout(30000);
+                conn.setConnectTimeout(30 * 1000);
+                conn.setReadTimeout(5 * 60 * 1000);
                 if (post) {
                     conn.setRequestMethod("POST");
                 }
@@ -500,6 +501,48 @@ public final class Helper {
             result[i] = (byte) Integer.parseInt(data[i]);
         }
         return result;
+    }
+
+    public final static String formatDuration(final long duration) {
+        if (duration == -1) {
+            return "???";
+        } else {
+            final long v = Math.abs(duration);
+            final long days = v / 1000 / 60 / 60 / 24;
+            final long hours = (v / 1000 / 60 / 60) % 24;
+            final long mins = (v / 1000 / 60) % 60;
+            final long secs = (v / 1000) % 60;
+            final long millis = v % 1000;
+            StringBuilder out = new StringBuilder();
+            if (days > 0) {
+                out.append(days).append(':').append(Helper.padding(hours, 2, '0')).append(':')
+                        .append(Helper.padding(mins, 2, '0')).append(":").append(Helper.padding(secs, 2, '0'))
+                        .append(".").append(Helper.padding(millis, 3, '0'));
+            } else if (hours > 0) {
+                out.append(hours).append(':').append(Helper.padding(mins, 2, '0')).append(":")
+                        .append(Helper.padding(secs, 2, '0')).append(".").append(Helper.padding(millis, 3, '0'));
+            } else if (mins > 0) {
+                out.append(mins).append(":").append(Helper.padding(secs, 2, '0')).append(".")
+                        .append(Helper.padding(millis, 3, '0'));
+            } else {
+                out.append(secs).append(".").append(Helper.padding(millis, 3, '0'));
+            }
+            return out.toString();
+        }
+    }
+
+    public final static String padding(long value, int len, char c) {
+        return Helper.padding(String.valueOf(value), len, c);
+    }
+
+    public final static String padding(String text, int len, char c) {
+        if ((text != null) && (len > text.length())) {
+            char[] spaces = new char[len - text.length()];
+            Arrays.fill(spaces, c);
+            return new String(spaces) + text;
+        } else {
+            return text;
+        }
     }
 
 }
