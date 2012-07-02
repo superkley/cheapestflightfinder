@@ -36,7 +36,9 @@ public class CheapestFlightFinder {
     private static final int MAX_CONNECTIONS = 10;
     private static Main MAIN;
     private static ExecutorService EXECUTOR = Executors.newFixedThreadPool(CheapestFlightFinder.MAX_CONNECTIONS);
-    private static Semaphore LOCK;
+    protected static Semaphore LOCK;
+    protected static long started;
+    protected static int totalFlights;
     private static final int RETRIES = 2;
     private static final boolean DEBUG = true;
 
@@ -51,6 +53,7 @@ public class CheapestFlightFinder {
 
     public static void search(String from, String to, Calendar startDate, Calendar endDate, int minDays, int maxDays,
             boolean nonStop, boolean economy, boolean back) throws InterruptedException, IOException {
+        CheapestFlightFinder.started = System.currentTimeMillis();
         List<Flight> possibleFlights = new LinkedList<Flight>();
         GregorianCalendar limit = (GregorianCalendar) startDate.clone();
         if (back) {
@@ -93,10 +96,10 @@ public class CheapestFlightFinder {
             }
         }
 
-        final int size = possibleFlights.size();
-        System.out.println(from + "->" + to + " - 共查询总数：" + size);
-        CheapestFlightFinder.LOCK = new Semaphore(size);
-        CheapestFlightFinder.LOCK.acquire(size);
+        CheapestFlightFinder.totalFlights = possibleFlights.size();
+        System.out.println(from + "->" + to + " - 共查询总数：" + CheapestFlightFinder.totalFlights);
+        CheapestFlightFinder.LOCK = new Semaphore(CheapestFlightFinder.totalFlights);
+        CheapestFlightFinder.LOCK.acquire(CheapestFlightFinder.totalFlights);
 
         for (final Flight flight : possibleFlights) {
             CheapestFlightFinder.EXECUTOR.execute(new Runnable() {
@@ -118,7 +121,8 @@ public class CheapestFlightFinder {
             });
         }
 
-        CheapestFlightFinder.LOCK.acquire(size);
+        CheapestFlightFinder.MAIN.onFlightFound(null);
+        CheapestFlightFinder.LOCK.acquire(CheapestFlightFinder.totalFlights);
         // es.awaitTermination(1, TimeUnit.SECONDS);
         //
         // Collections.sort(possibleFlights, new Comparator<Flight>() {
