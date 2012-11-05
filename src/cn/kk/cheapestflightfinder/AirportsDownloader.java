@@ -35,7 +35,6 @@ public class AirportsDownloader {
      */
     public static void main(String[] args) throws IOException {
         int page = 1;
-        int counter = 0;
         String url = "http://flug.idealo.de/flughafen/?o=3";
         Helper helper = new Helper();
         BufferedWriter writer = new BufferedWriter(new FileWriter("D:\\airports.lst", true));
@@ -60,7 +59,6 @@ public class AirportsDownloader {
                     if (c == 0) {
                         break;
                     }
-                    counter += c;
                     Thread.sleep(2000);
                 } catch (Exception e) {
                     e.printStackTrace();

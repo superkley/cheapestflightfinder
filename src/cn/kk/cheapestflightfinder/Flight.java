@@ -24,7 +24,15 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 public class Flight {
+    private static String fill(int i) {
+        if (i < 10) {
+            return "0" + i;
+        } else {
+            return String.valueOf(i);
+        }
+    }
     private GregorianCalendar departureDate;
+
     private GregorianCalendar returnDate;
 
     private String accDep = "FRA";
@@ -68,6 +76,15 @@ public class Flight {
         return this.accDep;
     }
 
+    private String getCalendarString(GregorianCalendar calendar) {
+        if (this.returnDate != null) {
+            return fill(calendar.get(Calendar.DAY_OF_MONTH)) + "." + fill(calendar.get(Calendar.MONTH) + 1) + "."
+                    + calendar.get(Calendar.YEAR);
+        } else {
+            return "";
+        }
+    }
+
     public String getDepAirline() {
         return this.depAirline;
     }
@@ -96,6 +113,14 @@ public class Flight {
         return this.price;
     }
 
+    public double getPriceValue() {
+        return this.priceValue;
+    }
+
+    public String getResultPage() {
+        return this.resultPage;
+    }
+
     public String getRetAirline() {
         return this.retAirline;
     }
@@ -116,21 +141,8 @@ public class Flight {
         }
     }
 
-    private String getCalendarString(GregorianCalendar calendar) {
-        if (this.returnDate != null) {
-            return fill(calendar.get(Calendar.DAY_OF_MONTH)) + "." + fill(calendar.get(Calendar.MONTH) + 1) + "."
-                    + calendar.get(Calendar.YEAR);
-        } else {
-            return "";
-        }
-    }
-
-    private String fill(int i) {
-        if (i < 10) {
-            return "0" + i;
-        } else {
-            return String.valueOf(i);
-        }
+    public String getSearchPage() {
+        return searchPage;
     }
 
     public boolean isCabinClass() {
@@ -186,6 +198,14 @@ public class Flight {
         }
     }
 
+    public void setPriceValue(double priceValue) {
+        this.priceValue = priceValue;
+    }
+
+    public void setResultPage(String resultPage) {
+        this.resultPage = resultPage;
+    }
+
     public void setRetAirline(String retAirline) {
         this.retAirline = retAirline;
     }
@@ -198,33 +218,13 @@ public class Flight {
         this.returnDate = returnDate;
     }
 
+    public void setSearchPage(String searchPage) {
+        this.searchPage = searchPage;
+    }
+
     @Override
     public String toString() {
         return "[" + getDepartureDateAsString() + ", " + getReturnDateAsString() + "] " + this.price + " ("
                 + this.depDuration + " / " + this.depAirline + ", " + this.retDuration + " / " + this.retAirline + ")";
-    }
-
-    public double getPriceValue() {
-        return this.priceValue;
-    }
-
-    public void setPriceValue(double priceValue) {
-        this.priceValue = priceValue;
-    }
-
-    public String getResultPage() {
-        return this.resultPage;
-    }
-
-    public void setResultPage(String resultPage) {
-        this.resultPage = resultPage;
-    }
-
-    public String getSearchPage() {
-        return searchPage;
-    }
-
-    public void setSearchPage(String searchPage) {
-        this.searchPage = searchPage;
     }
 }

@@ -9,14 +9,14 @@ public class Messages {
     private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(Messages.BUNDLE_NAME,
             new UTF8Control());
 
-    private Messages() {
-    }
-
     public static String getString(String key) {
         try {
             return Messages.RESOURCE_BUNDLE.getString(key);
         } catch (MissingResourceException e) {
             return '!' + key + '!';
         }
+    }
+
+    private Messages() {
     }
 }

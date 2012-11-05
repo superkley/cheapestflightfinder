@@ -5,6 +5,8 @@ import java.awt.Dimension;
 import javax.swing.JComboBox;
 
 public class WideComboBox extends JComboBox {
+  private static final long serialVersionUID = 1L;
+
     public WideComboBox() {
         setMaximumRowCount(20);
     }
