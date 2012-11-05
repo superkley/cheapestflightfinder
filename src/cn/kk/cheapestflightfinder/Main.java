@@ -197,6 +197,27 @@ public class Main extends javax.swing.JFrame
   }
 
 
+  public static final String substringBetween(final String text, final String start, final String end,
+      final boolean trim)
+  {
+    final int nStart = text.indexOf(start);
+    final int nEnd = text.indexOf(end, nStart + start.length() + 1);
+    if (nStart != -1 && nEnd > nStart)
+    {
+      if (trim)
+      {
+        return text.substring(nStart + start.length(), nEnd).trim();
+      } else
+      {
+        return text.substring(nStart + start.length(), nEnd);
+      }
+    } else
+    {
+      return null;
+    }
+  }
+
+
   private static void updateLocation(JComboBox cb)
   {
     JTextField tf = (JTextField) cb.getEditor().getEditorComponent();
@@ -207,11 +228,38 @@ public class Main extends javax.swing.JFrame
     for (int i = 0; i < size; i++)
     {
       String test = (String) model.getElementAt(i);
-      if (test.toUpperCase().startsWith(val.toUpperCase()))
+      String id = substringBetween(test, "[", "]", true);
+      if (id != null && id.toUpperCase().startsWith(val.toUpperCase()))
       {
         idx = i;
         tf.setText(test);
         break;
+      }
+    }
+    if (idx == -1)
+    {
+      for (int i = 0; i < size; i++)
+      {
+        String test = (String) model.getElementAt(i);
+        if (test.toUpperCase().startsWith(val.toUpperCase()))
+        {
+          idx = i;
+          tf.setText(test);
+          break;
+        }
+      }
+    }
+    if (idx == -1)
+    {
+      for (int i = 0; i < size; i++)
+      {
+        String test = (String) model.getElementAt(i);
+        if (test.toUpperCase().contains(val.toUpperCase()))
+        {
+          idx = i;
+          tf.setText(test);
+          break;
+        }
       }
     }
     if (idx != -1)
@@ -220,25 +268,18 @@ public class Main extends javax.swing.JFrame
     }
   }
 
-
   // Variables declaration - do not modify
   private javax.swing.JButton btnSave;
 
-
   private javax.swing.JButton btnSearch;
-
 
   private javax.swing.JComboBox cbDepDay;
 
-
   private javax.swing.JComboBox cbDepMonth;
-
 
   private javax.swing.JComboBox cbDepYear;
 
-
   private javax.swing.JComboBox cbFrom;
-
 
   private javax.swing.JComboBox cbReturnDay;
 
@@ -279,6 +320,7 @@ public class Main extends javax.swing.JFrame
   private javax.swing.JFormattedTextField tfMin;
 
   private JLabel lblProgress;
+
 
   /**
    * Creates new form Find
@@ -360,6 +402,7 @@ public class Main extends javax.swing.JFrame
     });
   }
 
+
   private void btnSaveActionPerformed(ActionEvent evt)
   {
     JFileChooser fc = new JFileChooser();
@@ -386,6 +429,7 @@ public class Main extends javax.swing.JFrame
       saveResults(f);
     }
   }
+
 
   private void btnSearchActionPerformed(java.awt.event.ActionEvent evt)
   {
@@ -457,15 +501,18 @@ public class Main extends javax.swing.JFrame
     }
   }
 
+
   private void cbDepMonthActionPerformed(java.awt.event.ActionEvent evt)
   {
     Main.checkMaxDays(this.cbDepYear, this.cbDepMonth, this.cbDepDay);
   }
 
+
   private void cbReturnMonthActionPerformed(java.awt.event.ActionEvent evt)
   {
     Main.checkMaxDays(this.cbReturnYear, this.cbReturnMonth, this.cbReturnDay);
   }
+
 
   private void checkReturnState()
   {
@@ -481,6 +528,7 @@ public class Main extends javax.swing.JFrame
       this.lblReturn.setToolTipText(Messages.getString("main.latestDeparture")); //$NON-NLS-1$
     }
   }
+
 
   private void chkReturnActionPerformed(java.awt.event.ActionEvent evt)
   {
