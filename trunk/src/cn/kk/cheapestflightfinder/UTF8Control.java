@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 import java.util.ResourceBundle.Control;
 
 public class UTF8Control extends Control {
+    @SuppressWarnings("resource")
     @Override
     public ResourceBundle newBundle(String baseName, Locale locale, String format, ClassLoader loader, boolean reload)
             throws IllegalAccessException, InstantiationException, IOException {
